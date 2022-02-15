@@ -19,8 +19,12 @@ public class GamePanel extends JPanel implements Runnable {
     Paddle paddle2;
     Ball ball;
     Score score;
+    Sound sound1; 
+    Sound sound2; 
+    Sound sound3;
 
     GamePanel() { 
+        newSound();
         newPaneles();
         newBall();
         score = new Score(GAME_WIDTH,GAME_HEIGHT);
@@ -30,7 +34,11 @@ public class GamePanel extends JPanel implements Runnable {
         gameThread = new Thread(this);
         gameThread.start();
     }
-
+    public void newSound() {
+        sound1 = new Sound("/Users/vinh/PongGame/lib/Sound1.wav");
+        sound2 = new Sound("/Users/vinh/PongGame/lib/Sound2.wav");
+        sound3 = new Sound("/Users/vinh/PongGame/lib/Sound3.wav");
+    }
     public void newBall() {
         ball = new Ball((GAME_WIDTH/2) - (BALL_DIAMETER/2),(GAME_HEIGHT/2)-(BALL_DIAMETER/2),BALL_DIAMETER,BALL_DIAMETER);
     }
@@ -58,10 +66,12 @@ public class GamePanel extends JPanel implements Runnable {
     public void checkCollision() {
         // bounce ball off top & bottom window edges
         if(ball.y <= 0){
-            ball.setYDirection(-ball.yVelocity);
+            ball.setYDirection(-ball.yVelocity++);
+            sound2.play();
         }
         if(ball.y >= GAME_HEIGHT - BALL_DIAMETER){
-            ball.setYDirection(-ball.yVelocity);
+            ball.setYDirection(-ball.yVelocity++);
+            sound2.play();
         }
 
         // bounce ball off paddles
@@ -72,7 +82,7 @@ public class GamePanel extends JPanel implements Runnable {
             else ball.yVelocity--;
             ball.setXDirection(-ball.xVelocity);
             ball.setYDirection(ball.yVelocity);
-
+            sound2.play();
         }
 
         if(ball.intersects(paddle2)){
@@ -82,7 +92,7 @@ public class GamePanel extends JPanel implements Runnable {
             else ball.yVelocity--;
             ball.setXDirection(ball.xVelocity);
             ball.setYDirection(ball.yVelocity);
-
+            sound2.play();
         }
         //stops paddles at window edges
         if(paddle1.y <= 0) paddle1.y = 0;
@@ -93,6 +103,7 @@ public class GamePanel extends JPanel implements Runnable {
         // count point
         if(ball.x <= 0){
             score.player1++;
+            sound3.play();
             newPaneles();
             newBall();
             System.out.println("Player 1: " + score.player1);
@@ -100,6 +111,7 @@ public class GamePanel extends JPanel implements Runnable {
 
         if(ball.x >= GAME_WIDTH - BALL_DIAMETER){
             score.player2++;
+            sound3.play();
             newPaneles();
             newBall();
             System.out.println("Player 2: " + score.player2);
@@ -107,6 +119,8 @@ public class GamePanel extends JPanel implements Runnable {
     }
     public void run() {
         //game loop
+        sound1.vol();
+        sound1.loop();
         long lastTime = System.nanoTime();
         double amountOfTicks = 60.0;
         double ns = 1000000000 / amountOfTicks;
